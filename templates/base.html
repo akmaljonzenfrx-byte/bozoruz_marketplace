@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="uz" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}BozorUz - Zamonaviy Ko'p Sotuvchili Onlayn Savdo Platformasi{% endblock %}</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                        },
+                        brand: {
+                            violet: '#6366f1',
+                            purple: '#8b5cf6',
+                            emerald: '#10b981',
+                            dark: '#0f172a',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- RemixIcon Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    
+    <!-- Main Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    {% block styles %}{% endblock %}
+</head>
+<body class="bg-gray-50 text-gray-800 dark:bg-slate-900 dark:text-gray-100 font-sans antialiased flex flex-col min-h-screen transition-colors duration-200">
+
+    <!-- TEPA E'LON MUDDATI BAR -->
+    <div class="bg-gradient-to-r from-violet-700 via-indigo-600 to-emerald-600 text-white text-xs font-medium py-2 px-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-2 overflow-hidden whitespace-nowrap">
+                <span class="bg-white/20 text-white px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider">Aksiya</span>
+                <span>⚡ 200 000 so'mdan yuqori xaridlarga shahar bo'ylab bepul yetkazib berish!</span>
+            </div>
+            <div class="hidden md:flex items-center gap-6 text-xs text-white/90">
+                <a href="#" class="hover:text-white transition"><i class="ri-map-pin-line mr-1"></i>Toshkent</a>
+                <a href="#" class="hover:text-white transition"><i class="ri-shield-check-line mr-1"></i>Kafolat markazi</a>
+                <a href="{{ url_for('admin.admin_login') }}" class="hover:underline font-semibold bg-white/10 px-2 py-0.5 rounded text-white flex items-center gap-1">
+                    <i class="ri-store-3-line"></i> Sotuvchi kabineti
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN HEADER -->
+    <header class="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-gray-200 dark:border-slate-800 shadow-sm transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20 gap-4">
+                
+                <!-- MOBIL MENYU TUGMASI -->
+                <button id="mobileDrawerBtn" class="lg:hidden p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 focus:outline-none" aria-label="Menyuni ochish">
+                    <i class="ri-menu-2-line text-2xl"></i>
+                </button>
+
+                <!-- LOGO -->
+                <a href="{{ url_for('index') }}" class="flex items-center gap-2 group shrink-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 via-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform duration-200">
+                        <i class="ri-shopping-bag-3-fill text-2xl"></i>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-2xl font-black tracking-tight bg-gradient-to-r from-indigo-600 via-purple-600 to-emerald-500 bg-clip-text text-transparent">Bozor<span class="text-emerald-500">Uz</span></span>
+                        <span class="text-[9px] uppercase tracking-widest font-bold text-gray-400 dark:text-gray-500 -mt-1">Online Savdo</span>
+                    </div>
+                </a>
+
+                <!-- KATALOG TUGMASI (Desktop) -->
+                <div class="hidden lg:block relative group">
+                    <a href="{{ url_for('catalog') }}" class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-5 py-2.5 rounded-xl shadow-sm transition duration-200">
+                        <i class="ri-grid-fill text-lg"></i>
+                        <span>Katalog</span>
+                    </a>
+                </div>
+
+                <!-- JONLI QIDIRUV PANELI -->
+                <div class="flex-1 max-w-2xl relative hidden sm:block">
+                    <form action="{{ url_for('catalog') }}" method="GET" class="relative">
+                        <input type="text" 
+                               id="searchInput" 
+                               name="q" 
+                               value="{{ request.args.get('q', '') }}" 
+                               placeholder="Mahsulotlar, brendlar va kategoriyalar bo'yicha qidirish..." 
+                               autocomplete="off"
+                               class="w-full bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-gray-100 pl-4 pr-12 py-2.5 rounded-xl border border-transparent focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 transition duration-200 text-sm">
+                        <button type="submit" class="absolute right-1.5 top-1.5 bottom-1.5 px-3.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition duration-200 flex items-center justify-center" title="Qidirish">
+                            <i class="ri-search-line text-lg"></i>
+                        </button>
+                    </form>
+
+                    <!-- LIVE SEARCH AUTOCOMPLETE DROPDOWN -->
+                    <div id="searchResults" class="hidden absolute left-0 right-0 top-full mt-2 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-slate-700 overflow-hidden z-50">
+                        <div id="searchLoader" class="p-4 text-center text-gray-400 text-sm hidden">
+                            <i class="ri-loader-4-line animate-spin text-xl inline-block mr-2"></i> Qidirilmoqda...
+                        </div>
+                        <div id="searchList" class="divide-y divide-gray-100 dark:divide-slate-700/50 max-h-96 overflow-y-auto"></div>
+                    </div>
+                </div>
+
+                <!-- O'NG AMALLAR TUGMALARI -->
+                <div class="flex items-center gap-1 sm:gap-2">
+                    
+                    <!-- QORONG'U / YORUG' REJIM TOGGLE -->
+                    <button id="themeToggleBtn" title="Mavzuni o'zgartirish" class="p-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl transition">
+                        <i id="themeIcon" class="ri-moon-line text-xl"></i>
+                    </button>
+
+                    <!-- TAQQOSLASH -->
+                    <a href="{{ url_for('compare_view') }}" title="Solishtirish" class="p-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl transition relative hidden md:inline-flex">
+                        <i class="ri-scales-3-line text-xl"></i>
+                        <span id="compareBadge" class="absolute -top-1 -right-1 bg-amber-500 text-white text-[10px] font-extrabold w-5 h-5 rounded-full flex items-center justify-center {% if not compare_count %}hidden{% endif %}">
+                            {{ compare_count }}
+                        </span>
+                    </a>
+
+                    <!-- SEVIMLILAR -->
+                    <a href="{{ url_for('wishlist_view') }}" title="Sevimlilar" class="p-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl transition relative">
+                        <i class="ri-heart-3-line text-xl"></i>
+                        <span id="wishlistBadge" class="absolute -top-1 -right-1 bg-rose-500 text-white text-[10px] font-extrabold w-5 h-5 rounded-full flex items-center justify-center {% if not wishlist_count %}hidden{% endif %}">
+                            {{ wishlist_count }}
+                        </span>
+                    </a>
+
+                    <!-- SAVAT TUGMASI -->
+                    <a href="{{ url_for('cart_view') }}" class="flex items-center gap-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-semibold px-3.5 py-2 rounded-xl transition relative">
+                        <div class="relative">
+                            <i class="ri-shopping-cart-2-line text-xl"></i>
+                            <span id="cartBadge" class="absolute -top-2 -right-2 bg-emerald-600 text-white text-[10px] font-extrabold w-5 h-5 rounded-full flex items-center justify-center {% if not cart_count %}hidden{% endif %}">
+                                {{ cart_count }}
+                            </span>
+                        </div>
+                        <span class="hidden xl:inline text-sm">Savat</span>
+                    </a>
+
+                    <!-- AVTORIZATSIYA / PROFIL -->
+                    {% if current_user %}
+                    <div class="relative group ml-1">
+                        <button class="flex items-center gap-2 p-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-800 transition">
+                            <div class="w-8 h-8 rounded-lg text-white font-bold text-xs flex items-center justify-center shadow-sm" style="background-color: {{ current_user.avatar_color or '#6366F1' }}">
+                                {{ current_user.name[0]|upper }}
+                            </div>
+                            <span class="text-sm font-semibold hidden md:inline truncate max-w-[100px]">{{ current_user.name.split()[0] }}</span>
+                            <i class="ri-arrow-down-s-line text-gray-400"></i>
+                        </button>
+
+                        <div class="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-gray-100 dark:border-slate-700 py-2 hidden group-hover:block z-50">
+                            <div class="px-4 py-2 border-b border-gray-100 dark:border-slate-700">
+                                <p class="text-xs text-gray-400">Tizimdagi foydalanuvchi</p>
+                                <p class="text-sm font-bold truncate">{{ current_user.name }}</p>
+                                <p class="text-xs text-indigo-500 font-medium">{{ current_user.phone }}</p>
+                            </div>
+                            <a href="{{ url_for('profile_view') }}" class="flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-50 dark:hover:bg-slate-700/50">
+                                <i class="ri-user-line text-indigo-500"></i> Shaxsiy kabinet
+                            </a>
+                            <a href="{{ url_for('profile_view') }}#orders" class="flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-50 dark:hover:bg-slate-700/50">
+                                <i class="ri-file-list-3-line text-emerald-500"></i> Buyurtmalarim
+                            </a>
+                            <div class="border-t border-gray-100 dark:border-slate-700 my-1"></div>
+                            <a href="{{ url_for('auth_logout') }}" class="flex items-center gap-2 px-4 py-2 text-sm text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30">
+                                <i class="ri-logout-box-r-line"></i> Tizimdan chiqish
+                            </a>
+                        </div>
+                    </div>
+                    {% else %}
+                    <button onclick="openAuthModal()" class="ml-1 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-xl shadow-sm transition">
+                        Kirish
+                    </button>
+                    {% endif %}
+
+                </div>
+            </div>
+
+            <!-- MOBIL QIDIRUV (Faqat kichik ekranlarda) -->
+            <div class="pb-3 sm:hidden">
+                <form action="{{ url_for('catalog') }}" method="GET" class="relative">
+                    <input type="text" 
+                           name="q" 
+                           value="{{ request.args.get('q', '') }}" 
+                           placeholder="BozorUz'dan qidirish..." 
+                           class="w-full bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-gray-100 pl-4 pr-10 py-2 rounded-xl text-sm border-0 focus:ring-2 focus:ring-indigo-500">
+                    <button type="submit" class="absolute right-3 top-2.5 text-gray-400">
+                        <i class="ri-search-line"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- KATEGORIYALAR STRIP PANELI -->
+        <div class="bg-gray-50/80 dark:bg-slate-900/80 border-t border-gray-100 dark:border-slate-800/80 hidden lg:block overflow-x-auto">
+            <div class="max-w-7xl mx-auto px-4 flex items-center gap-6 py-2.5 text-xs font-semibold whitespace-nowrap scrollbar-none">
+                {% for cat in nav_categories %}
+                <a href="{{ url_for('catalog', kategoriya=cat.slug) }}" class="flex items-center gap-1.5 text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition">
+                    <span>{{ cat.icon }}</span>
+                    <span>{{ cat.name }}</span>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </header>
+
+    <!-- FLASH XABARLAR BILDIRISHNOMASI -->
+    <div class="max-w-7xl mx-auto px-4 mt-4 w-full">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="flash-alert p-4 rounded-2xl mb-3 flex items-center justify-between shadow-sm transition-all duration-300 
+                            {% if category == 'success' %}bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300
+                            {% elif category == 'danger' %}bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300
+                            {% elif category == 'warning' %}bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300
+                            {% else %}bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 text-indigo-800 dark:text-indigo-300{% endif %}">
+                    <div class="flex items-center gap-3">
+                        <i class="ri-{% if category == 'success' %}checkbox-circle-fill text-emerald-500
+                                     {% elif category == 'danger' %}error-warning-fill text-rose-500
+                                     {% elif category == 'warning' %}alert-fill text-amber-500
+                                     {% else %}information-fill text-indigo-500{% endif %} text-xl"></i>
+                        <span class="text-sm font-medium">{{ message }}</span>
+                    </div>
+                    <button onclick="this.parentElement.remove()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                        <i class="ri-close-line text-lg"></i>
+                    </button>
+                </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- MAIN CONTENT BLOCK -->
+    <main class="flex-grow">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-gray-900 text-gray-300 border-t border-gray-800 pt-12 pb-24 lg:pb-12 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
+                
+                <!-- BRAND INFO -->
+                <div class="lg:col-span-2">
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-indigo-600 flex items-center justify-center text-white">
+                            <i class="ri-shopping-bag-3-fill text-xl"></i>
+                        </div>
+                        <span class="text-2xl font-black text-white">Bozor<span class="text-emerald-400">Uz</span></span>
+                    </div>
+                    <p class="text-xs text-gray-400 mb-6 max-w-sm leading-relaxed">
+                        O'zbekistondagi eng qulay va zamonaviy ko'p sotuvchili e-commerce marketplace platformasi. Sifatli tovarlar, tezkor yetkazib berish va arzon narxlar!
+                    </p>
+                    <div class="flex items-center gap-3">
+                        <a href="#" class="w-9 h-9 bg-gray-800 hover:bg-indigo-600 text-white rounded-lg flex items-center justify-center transition"><i class="ri-telegram-fill text-lg"></i></a>
+                        <a href="#" class="w-9 h-9 bg-gray-800 hover:bg-rose-600 text-white rounded-lg flex items-center justify-center transition"><i class="ri-instagram-line text-lg"></i></a>
+                        <a href="#" class="w-9 h-9 bg-gray-800 hover:bg-blue-600 text-white rounded-lg flex items-center justify-center transition"><i class="ri-facebook-fill text-lg"></i></a>
+                        <a href="#" class="w-9 h-9 bg-gray-800 hover:bg-red-600 text-white rounded-lg flex items-center justify-center transition"><i class="ri-youtube-fill text-lg"></i></a>
+                    </div>
+                </div>
+
+                <!-- HARIDORLARGA -->
+                <div>
+                    <h4 class="text-sm font-bold text-white uppercase tracking-wider mb-4">Xaridorlarga</h4>
+                    <ul class="space-y-2 text-xs">
+                        <li><a href="#" class="hover:text-white transition">Yetkazib berish va to'lov</a></li>
+                        <li><a href="#" class="hover:text-white transition">Muddatli to'lov shartlari</a></li>
+                        <li><a href="#" class="hover:text-white transition">Qaytarish va almashtirish</a></li>
+                        <li><a href="#" class="hover:text-white transition">Ko'p beriladigan savollar</a></li>
+                        <li><a href="#" class="hover:text-white transition">Sayt xaritasi</a></li>
+                    </ul>
+                </div>
+
+                <!-- SOTUVCHILARGA -->
+                <div>
+                    <h4 class="text-sm font-bold text-white uppercase tracking-wider mb-4">Sotuvchilarga</h4>
+                    <ul class="space-y-2 text-xs">
+                        <li><a href="{{ url_for('admin.admin_login') }}" class="hover:text-white transition">BozorUz'da sotishni boshlang</a></li>
+                        <li><a href="{{ url_for('admin.admin_login') }}" class="hover:text-white transition">Sotuvchi kabinetiga kirish</a></li>
+                        <li><a href="#" class="hover:text-white transition">Fulfillment markazi</a></li>
+                        <li><a href="#" class="hover:text-white transition">Sotuvchilar uchun qoidalar</a></li>
+                    </ul>
+                </div>
+
+                <!-- BOG'LANISH VA TO'LOVLAR -->
+                <div>
+                    <h4 class="text-sm font-bold text-white uppercase tracking-wider mb-4">Qo'llab-quvvatlash</h4>
+                    <p class="text-xs text-gray-400 mb-2">Mijozlar xizmati (24/7):</p>
+                    <a href="tel:+998712000000" class="text-base font-bold text-emerald-400 block mb-4">+998 (71) 200-00-00</a>
+                    
+                    <h5 class="text-xs font-bold text-white uppercase tracking-wider mb-2">To'lov usullari</h5>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="bg-gray-800 px-2.5 py-1 rounded text-[11px] font-bold text-blue-400 border border-gray-700">CLICK</span>
+                        <span class="bg-gray-800 px-2.5 py-1 rounded text-[11px] font-bold text-emerald-400 border border-gray-700">Payme</span>
+                        <span class="bg-gray-800 px-2.5 py-1 rounded text-[11px] font-bold text-purple-400 border border-gray-700">Uzum</span>
+                        <span class="bg-gray-800 px-2.5 py-1 rounded text-[11px] font-bold text-amber-400 border border-gray-700">Naqd</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- COPYRIGHT BAR -->
+            <div class="border-t border-gray-800 pt-6 flex flex-col md:flex-row items-center justify-between text-xs text-gray-500 gap-4">
+                <p>&copy; 2025 "BozorUz" Marketplace platformasi. Barcha huquqlar himoyalangan.</p>
+                <div class="flex gap-4">
+                    <a href="#" class="hover:text-gray-400">Maxfiylik siyosati</a>
+                    <a href="#" class="hover:text-gray-400">Foydalanish shartlari</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- MOBIL PASTKI NAVIGATSIYA (FIXED BOTTOM) -->
+    <div class="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-gray-200 dark:border-slate-800 py-2 px-4 z-40">
+        <div class="flex items-center justify-around text-center">
+            <a href="{{ url_for('index') }}" class="flex flex-col items-center text-xs font-medium text-indigo-600 dark:text-indigo-400">
+                <i class="ri-home-5-fill text-xl"></i>
+                <span>Bosh sahifa</span>
+            </a>
+            <a href="{{ url_for('catalog') }}" class="flex flex-col items-center text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-indigo-600">
+                <i class="ri-grid-line text-xl"></i>
+                <span>Katalog</span>
+            </a>
+            <a href="{{ url_for('cart_view') }}" class="flex flex-col items-center text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-indigo-600 relative">
+                <i class="ri-shopping-cart-2-line text-xl"></i>
+                <span>Savat</span>
+                <span class="mobile-cart-badge absolute -top-1 right-2 bg-emerald-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center {% if not cart_count %}hidden{% endif %}">
+                    {{ cart_count }}
+                </span>
+            </a>
+            <a href="{{ url_for('wishlist_view') }}" class="flex flex-col items-center text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-indigo-600">
+                <i class="ri-heart-3-line text-xl"></i>
+                <span>Sevimlilar</span>
+            </a>
+            {% if current_user %}
+            <a href="{{ url_for('profile_view') }}" class="flex flex-col items-center text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-indigo-600">
+                <i class="ri-user-3-line text-xl"></i>
+                <span>Kabinet</span>
+            </a>
+            {% else %}
+            <button onclick="openAuthModal()" class="flex flex-col items-center text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-indigo-600">
+                <i class="ri-login-box-line text-xl"></i>
+                <span>Kirish</span>
+            </button>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- MOBIL DRAWER MENYU MODAL -->
+    <div id="mobileDrawer" class="fixed inset-0 bg-black/60 z-50 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="fixed inset-y-0 left-0 w-4/5 max-w-sm bg-white dark:bg-slate-900 shadow-2xl p-6 flex flex-col justify-between transform -translate-x-full transition-transform duration-300 overflow-y-auto">
+            <div>
+                <div class="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-slate-800">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-500 text-white flex items-center justify-center font-bold">B</div>
+                        <span class="font-bold text-lg">BozorUz Menyu</span>
+                    </div>
+                    <button id="closeDrawerBtn" class="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                        <i class="ri-close-line text-2xl"></i>
+                    </button>
+                </div>
+
+                <div class="py-4 space-y-1">
+                    <a href="{{ url_for('index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-100 dark:hover:bg-slate-800">
+                        <i class="ri-home-4-line text-indigo-500 text-lg"></i> Bosh sahifa
+                    </a>
+                    <a href="{{ url_for('catalog') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-100 dark:hover:bg-slate-800">
+                        <i class="ri-grid-line text-emerald-500 text-lg"></i> Barcha kategoriyalar
+                    </a>
+                    <a href="{{ url_for('cart_view') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-100 dark:hover:bg-slate-800">
+                        <i class="ri-shopping-bag-line text-amber-500 text-lg"></i> Savat va xaridlar
+                    </a>
+                    <a href="{{ url_for('wishlist_view') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-100 dark:hover:bg-slate-800">
+                        <i class="ri-heart-line text-rose-500 text-lg"></i> Sevimlilar
+                    </a>
+                    <a href="{{ url_for('compare_view') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-100 dark:hover:bg-slate-800">
+                        <i class="ri-scales-3-line text-purple-500 text-lg"></i> Tovar taqqoslash
+                    </a>
+                </div>
+
+                <div class="pt-4 border-t border-gray-100 dark:border-slate-800">
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Kategoriyalar</p>
+                    <div class="space-y-1">
+                        {% for cat in nav_categories %}
+                        <a href="{{ url_for('catalog', kategoriya=cat.slug) }}" class="flex items-center gap-2 text-xs py-1.5 px-2 hover:text-indigo-600">
+                            <span>{{ cat.icon }}</span>
+                            <span>{{ cat.name }}</span>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-6 border-t border-gray-100 dark:border-slate-800">
+                <a href="{{ url_for('admin.admin_login') }}" class="w-full bg-slate-800 text-white text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2">
+                    <i class="ri-store-2-line"></i> Sotuvchi paneli
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- AVTORIZATSIYA MODAL (SMS SIMULATSIYASI BILAN) -->
+    <div id="authModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-gray-100 dark:border-slate-800 relative animate-scaleUp">
+            
+            <button onclick="closeAuthModal()" class="absolute right-4 top-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                <i class="ri-close-line text-2xl"></i>
+            </button>
+
+            <!-- BO'LIM 1: TELEFON RAQAM KIRITISH -->
+            <div id="authStep1">
+                <div class="text-center mb-6">
+                    <div class="w-12 h-12 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 rounded-2xl flex items-center justify-center mx-auto mb-3 text-2xl">
+                        <i class="ri-phone-find-line"></i>
+                    </div>
+                    <h3 class="text-xl font-extrabold text-gray-900 dark:text-white">BozorUz'ga kirish</h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Telefon raqamingizni kiriting, SMS simulyatsiya kodi yuboriladi</p>
+                </div>
+
+                <form id="smsSendForm" onsubmit="handleSendSms(event)">
+                    <div class="mb-4">
+                        <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Telefon raqami</label>
+                        <div class="relative">
+                            <span class="absolute left-4 top-3 text-sm font-semibold text-gray-500">+998</span>
+                            <input type="tel" id="authPhone" required placeholder="90 123 45 67" class="w-full bg-gray-50 dark:bg-slate-800 pl-16 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 focus:ring-2 focus:ring-indigo-500 text-sm font-semibold">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-indigo-500/20 text-sm">
+                        SMS Kod Olish
+                    </button>
+                </form>
+
+                <div class="mt-6 pt-4 border-t border-gray-100 dark:border-slate-800 text-center">
+                    <p class="text-xs text-gray-400">Parol orqali kirmoqchimisiz? <a href="{{ url_for('auth_login') }}" class="text-indigo-600 font-bold hover:underline">Doimiy kirish</a></p>
+                </div>
+            </div>
+
+            <!-- BO'LIM 2: SMS KOD TASDIQLASH -->
+            <div id="authStep2" class="hidden">
+                <div class="text-center mb-4">
+                    <div class="w-12 h-12 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-center mx-auto mb-3 text-2xl">
+                        <i class="ri-shield-check-line"></i>
+                    </div>
+                    <h3 class="text-xl font-extrabold text-gray-900 dark:text-white">SMS Kodni Tasdiqlash</h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1"><span id="displayPhone"></span> raqamiga yuborildi</p>
+                </div>
+
+                <!-- SIMULATSIYA QILINGAN CODE DISPLAY BANNER -->
+                <div class="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 rounded-xl p-3 mb-4 text-center">
+                    <p class="text-[11px] text-amber-800 dark:text-amber-300 font-bold uppercase tracking-wider">⚡ SMS SIMULATOR KODI</p>
+                    <p class="text-2xl font-black text-amber-600 dark:text-amber-400 tracking-widest my-1" id="simulatedCodeDisplay">000000</p>
+                    <p class="text-[10px] text-gray-500">(Ushbu kod o'quv simulyatsiyasi uchun ekranda chiqmoqda)</p>
+                </div>
+
+                <form id="smsVerifyForm" onsubmit="handleVerifySms(event)">
+                    <div class="mb-3">
+                        <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">SMS Kod</label>
+                        <input type="text" id="authCode" maxlength="6" required placeholder="6 xonali kod" class="w-full text-center text-xl font-bold tracking-widest bg-gray-50 dark:bg-slate-800 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 focus:ring-2 focus:ring-emerald-500">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Ismingiz</label>
+                        <input type="text" id="authName" placeholder="Alisher Navoiy" class="w-full bg-gray-50 dark:bg-slate-800 px-4 py-2 rounded-xl border border-gray-200 dark:border-slate-700 text-sm">
+                    </div>
+
+                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-emerald-500/20 text-sm mt-2">
+                        Tasdiqlash va Kirish
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MAIN JAVASCRIPT FILE -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>
