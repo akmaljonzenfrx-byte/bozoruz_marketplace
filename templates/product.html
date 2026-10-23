@@ -1,0 +1,546 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }} — BozorUz{% endblock %}
+
+{% block content %}
+<div class="space-y-8 pb-12">
+
+    <!-- BREADCRUMB -->
+    <nav class="flex text-xs text-gray-500 dark:text-gray-400 gap-2 items-center flex-wrap">
+        <a href="/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Bosh sahifa</a>
+        <span>/</span>
+        <a href="/katalog" class="hover:text-indigo-600 dark:hover:text-indigo-400">Katalog</a>
+        {% if product.category_name %}
+        <span>/</span>
+        <a href="/katalog?kategoriya={{ product.category_slug or '' }}" class="hover:text-indigo-600 dark:hover:text-indigo-400">{{ product.category_name }}</a>
+        {% endif %}
+        <span>/</span>
+        <span class="text-gray-800 dark:text-gray-200 font-medium truncate max-w-xs sm:max-w-md">{{ product.name }}</span>
+    </nav>
+
+    <!-- PRODUCT MAIN DETAIL GRID -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+        <!-- LEFT COLUMN: IMAGE SHOWCASE & GALLERY (5 cols) -->
+        <div class="lg:col-span-5 space-y-4">
+            <!-- Big Image Showcase -->
+            <div class="relative w-full aspect-square rounded-3xl bg-gradient-to-br {{ product.bg_gradient or product.color_theme or 'from-indigo-500 via-purple-500 to-pink-500' }} flex items-center justify-center text-8xl sm:text-9xl shadow-xl overflow-hidden group">
+                <span class="transform group-hover:scale-110 transition-transform duration-500 select-none filter drop-shadow-2xl">
+                    {{ product.image_icon or product.icon or '📦' }}
+                </span>
+
+                {% if product.discount_percent %}
+                <span class="absolute top-4 left-4 bg-rose-600 text-white font-extrabold text-xs sm:text-sm px-3 py-1 rounded-full shadow-lg border border-white/20">
+                    -{{ product.discount_percent }}% CHEGIRMA
+                </span>
+                {% endif %}
+
+                {% if product.is_flash_sale %}
+                <span class="absolute top-4 right-4 bg-amber-500 text-gray-900 font-extrabold text-xs px-3 py-1 rounded-full shadow-lg flex items-center gap-1">
+                    ⚡ FLASH SALE
+                </span>
+                {% endif %}
+            </div>
+
+            <!-- Image Thumbnails / Angles Simulation -->
+            <div class="grid grid-cols-4 gap-3">
+                <button type="button" class="aspect-square rounded-2xl bg-gradient-to-br {{ product.bg_gradient or 'from-indigo-500 to-purple-600' }} p-1 border-2 border-indigo-600 flex items-center justify-center text-2xl shadow-sm focus:outline-none">
+                    <span>{{ product.image_icon or product.icon or '📦' }}</span>
+                </button>
+                <button type="button" class="aspect-square rounded-2xl bg-gray-100 dark:bg-gray-800 hover:border-2 hover:border-indigo-500 flex items-center justify-center text-2xl text-gray-400 dark:text-gray-600 transition-all focus:outline-none">
+                    <span>📐</span>
+                </button>
+                <button type="button" class="aspect-square rounded-2xl bg-gray-100 dark:bg-gray-800 hover:border-2 hover:border-indigo-500 flex items-center justify-center text-2xl text-gray-400 dark:text-gray-600 transition-all focus:outline-none">
+                    <span>🔍</span>
+                </button>
+                <button type="button" class="aspect-square rounded-2xl bg-gray-100 dark:bg-gray-800 hover:border-2 hover:border-indigo-500 flex items-center justify-center text-2xl text-gray-400 dark:text-gray-600 transition-all focus:outline-none">
+                    <span>✨</span>
+                </button>
+            </div>
+
+            <!-- Guarantee & Shipping Badges -->
+            <div class="grid grid-cols-2 gap-3 pt-2">
+                <div class="p-3.5 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700/80 flex items-center gap-3 shadow-sm">
+                    <span class="text-2xl">🚚</span>
+                    <div>
+                        <div class="text-xs font-bold text-gray-900 dark:text-white">Bepul yetkazish</div>
+                        <div class="text-[10px] text-gray-500 dark:text-gray-400">1 kunda xonadoningizga</div>
+                    </div>
+                </div>
+                <div class="p-3.5 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700/80 flex items-center gap-3 shadow-sm">
+                    <span class="text-2xl">🛡️</span>
+                    <div>
+                        <div class="text-xs font-bold text-gray-900 dark:text-white">Rasmiy kafolat</div>
+                        <div class="text-[10px] text-gray-500 dark:text-gray-400">12 oy xavfsiz kafolat</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: DETAILS & ACTIONS (7 cols) -->
+        <div class="lg:col-span-7 space-y-6 bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-3xl border border-gray-100 dark:border-gray-700/80 shadow-sm">
+            
+            <!-- BRAND & SKU -->
+            <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                <span class="font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider bg-indigo-50 dark:bg-indigo-950/60 px-3 py-1 rounded-full">
+                    Brend: {{ product.brand or 'BozorUz' }}
+                </span>
+                <span>Artikul: <strong class="font-mono text-gray-700 dark:text-gray-300">{{ product.sku or ('BZ-' ~ product.id) }}</strong></span>
+            </div>
+
+            <!-- TITLE -->
+            <h1 class="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white leading-tight">
+                {{ product.name }}
+            </h1>
+
+            <!-- REVIEWS & RATING BAR -->
+            <div class="flex items-center gap-4 text-xs">
+                <div class="flex items-center gap-1 bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 px-2.5 py-1 rounded-xl font-bold">
+                    <span>⭐</span>
+                    <span>{{ product.rating or '4.9' }}</span>
+                </div>
+                <a href="#reviews-section" class="text-indigo-600 dark:text-indigo-400 font-semibold hover:underline">
+                    {{ product.reviews_count or 12 }} ta sharhlar
+                </a>
+                <span class="text-gray-300 dark:text-gray-700">•</span>
+                <span class="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    Sotuvda {{ product.stock or 15 }} ta bor
+                </span>
+            </div>
+
+            <!-- PRICE BLOCK -->
+            <div class="p-4 bg-gray-50 dark:bg-gray-900/60 rounded-2xl space-y-1">
+                <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Narx:</div>
+                <div class="flex items-baseline gap-3">
+                    <span class="text-3xl sm:text-4xl font-black text-gray-900 dark:text-white">
+                        {{ "{:,}".format(product.price).replace(',', ' ') }} so'm
+                    </span>
+                    {% if product.old_price %}
+                    <span class="text-base text-gray-400 line-through">
+                        {{ "{:,}".format(product.old_price).replace(',', ' ') }} so'm
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- MUDDATLI TO'LOV KALKULYATORI (INSTALLMENT BOX) -->
+            <div class="p-5 bg-gradient-to-br from-indigo-50/80 via-purple-50/50 to-pink-50/50 dark:from-indigo-950/40 dark:via-purple-950/20 dark:to-pink-950/20 rounded-2xl border border-indigo-100 dark:border-indigo-900/40 space-y-3">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold uppercase tracking-wider text-indigo-900 dark:text-indigo-300 flex items-center gap-1.5">
+                        <span>💳</span> Muddatli to'lov kalkulyatori
+                    </span>
+                    <span class="text-[10px] bg-indigo-600 text-white font-bold px-2 py-0.5 rounded-full">0% Boshlang'ich</span>
+                </div>
+
+                <!-- MONTH SELECTORS -->
+                <div class="grid grid-cols-3 gap-2">
+                    <button type="button" data-months="3" class="installment-month-btn py-2 px-3 rounded-xl border text-xs font-bold text-center transition-all border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:border-indigo-500">
+                        3 oy
+                    </button>
+                    <button type="button" data-months="6" class="installment-month-btn py-2 px-3 rounded-xl border text-xs font-bold text-center transition-all border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:border-indigo-500">
+                        6 oy
+                    </button>
+                    <button type="button" data-months="12" class="installment-month-btn py-2 px-3 rounded-xl border text-xs font-bold text-center transition-all border-indigo-600 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400">
+                        12 oy
+                    </button>
+                </div>
+
+                <!-- MONTHLY RESULT -->
+                <div class="flex items-center justify-between pt-1">
+                    <span class="text-xs text-gray-600 dark:text-gray-400 font-medium">Oylik to'lov:</span>
+                    <span id="installment-monthly-price" class="text-lg font-black text-indigo-600 dark:text-indigo-400">
+                        {{ "{:,}".format((product.price * 1.12 / 12)|round|int).replace(',', ' ') }} so'm
+                    </span>
+                </div>
+            </div>
+
+            <!-- VARIANTS (RANG / O'LCHAM) -->
+            <div class="space-y-2">
+                <label class="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                    Variantni tanlang:
+                </label>
+                <div class="flex flex-wrap gap-2" id="variant-selector-group">
+                    <button type="button" class="variant-opt-btn px-4 py-2 rounded-xl border-2 border-indigo-600 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 text-xs font-bold shadow-sm">
+                        Asosiy
+                    </button>
+                    <button type="button" class="variant-opt-btn px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-xs font-bold hover:border-indigo-500">
+                        Pro Max
+                    </button>
+                    <button type="button" class="variant-opt-btn px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-xs font-bold hover:border-indigo-500">
+                        Standart
+                    </button>
+                </div>
+            </div>
+
+            <!-- QUANTITY SELECTOR -->
+            <div class="space-y-2">
+                <label class="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                    Miqdor:
+                </label>
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50 dark:bg-gray-900 p-1">
+                        <button type="button" id="qty-minus" class="w-9 h-9 rounded-xl bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 font-bold flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 shadow-sm transition-all text-base">-</button>
+                        <input type="number" id="product-qty-input" value="1" min="1" max="{{ product.stock or 99 }}" class="w-12 text-center bg-transparent font-bold text-sm text-gray-900 dark:text-white outline-none">
+                        <button type="button" id="qty-plus" class="w-9 h-9 rounded-xl bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 font-bold flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 shadow-sm transition-all text-base">+</button>
+                    </div>
+                    <span class="text-xs text-gray-400">Mavjud zaxira: {{ product.stock or 10 }} ta</span>
+                </div>
+            </div>
+
+            <!-- ACTION BUTTONS -->
+            <div class="space-y-3 pt-2">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <button type="button" onclick="handleAddToCart()" data-cart-btn="{{ product.id }}" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-sm rounded-2xl shadow-lg shadow-indigo-600/30 transition-all active:scale-95 flex items-center justify-center gap-2">
+                        <span>🛒</span>
+                        <span>Savatga qo'shish</span>
+                    </button>
+
+                    <a href="/buyurtma-berish" onclick="handleAddToCart();" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm rounded-2xl shadow-lg shadow-emerald-600/30 transition-all active:scale-95 flex items-center justify-center gap-2 text-center">
+                        <span>⚡</span>
+                        <span>Hoziroq sotib olish</span>
+                    </a>
+                </div>
+
+                <!-- SECONDARY ACTION BUTTONS (WISHLIST, COMPARE, PRICE ALERT) -->
+                <div class="flex items-center gap-2 pt-1">
+                    <button type="button" onclick="addToWishlist({{ product.id }})" class="wishlist-btn-{{ product.id }} flex-1 py-2.5 px-3 bg-gray-100 dark:bg-gray-700/60 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-gray-700 dark:text-gray-200 hover:text-rose-600 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 21.364l-7.682-7.682a4.5 4.5 0 010-6.364z"/></svg>
+                        <span>Sevimlilarga</span>
+                    </button>
+
+                    <button type="button" onclick="addToCompare({{ product.id }})" class="flex-1 py-2.5 px-3 bg-gray-100 dark:bg-gray-700/60 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 text-gray-700 dark:text-gray-200 hover:text-indigo-600 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-1.5">
+                        <span>⚖️</span>
+                        <span>Solishtirish</span>
+                    </button>
+
+                    <button type="button" onclick="addPriceAlert({{ product.id }})" class="flex-1 py-2.5 px-3 bg-gray-100 dark:bg-gray-700/60 hover:bg-amber-50 dark:hover:bg-amber-950/40 text-gray-700 dark:text-gray-200 hover:text-amber-600 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-1.5">
+                        <span>🔔</span>
+                        <span>Narx tushsa xabar ber</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- SELLER INFORMATION BOX -->
+            <div class="p-4 border border-gray-100 dark:border-gray-700 rounded-2xl flex items-center justify-between text-xs">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-lg font-black">
+                        🏪
+                    </div>
+                    <div>
+                        <div class="font-bold text-gray-900 dark:text-white">Sotuvchi: {{ product.seller_name or 'BozorUz Rasmiy Do'koni' }}</div>
+                        <div class="text-gray-400">98% ijobiy sharhlar (1 420 ta sotuv)</div>
+                    </div>
+                </div>
+                <span class="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950 text-emerald-600 font-bold rounded-lg text-[10px]">
+                    Ishonchli sotuvchi
+                </span>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- TABS SECTION: DESCRIPTION, SPECS & REVIEWS -->
+    <div class="bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700/80 shadow-sm overflow-hidden">
+        
+        <!-- TAB HEADERS -->
+        <div class="flex border-b border-gray-100 dark:border-gray-700/80 bg-gray-50/50 dark:bg-gray-900/40">
+            <button type="button" onclick="switchTab('desc')" id="tab-btn-desc" class="tab-btn px-6 py-4 font-extrabold text-sm text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 transition-all flex items-center gap-2">
+                <span>📝</span> Tavsif va Xususiyatlar
+            </button>
+            <button type="button" onclick="switchTab('reviews')" id="tab-btn-reviews" class="tab-btn px-6 py-4 font-bold text-sm text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 border-b-2 border-transparent transition-all flex items-center gap-2">
+                <span>💬</span> Sharhlar ({{ product.reviews_count or 12 }})
+            </button>
+        </div>
+
+        <!-- TAB CONTENT 1: DESCRIPTION & SPECS -->
+        <div id="tab-content-desc" class="p-6 sm:p-8 space-y-8">
+            <!-- Full Description -->
+            <div class="space-y-3">
+                <h3 class="text-lg font-black text-gray-900 dark:text-white">Mahsulot haqida batafsil</h3>
+                <div class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed space-y-2">
+                    <p>{{ product.description or product.short_description or "Ushbu mahsulot yuqori sifatli xom-ashyolardan tayyorlangan bo'lib, xaridorlarning barcha talablariga to'liq javob beradi. Ergonomik dizayn va uzoq muddatli foydalanish kafolati bilan ta'minlangan." }}</p>
+                </div>
+            </div>
+
+            <!-- Specifications Table -->
+            <div class="space-y-4">
+                <h3 class="text-lg font-black text-gray-900 dark:text-white">Texnik xususiyatlari</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-sm">
+                    <div class="flex justify-between py-2 border-b border-gray-100 dark:border-gray-700/60">
+                        <span class="text-gray-400 font-medium">Brend</span>
+                        <span class="font-bold text-gray-800 dark:text-gray-200">{{ product.brand or 'BozorUz' }}</span>
+                    </div>
+                    <div class="flex justify-between py-2 border-b border-gray-100 dark:border-gray-700/60">
+                        <span class="text-gray-400 font-medium">Kategoriya</span>
+                        <span class="font-bold text-gray-800 dark:text-gray-200">{{ product.category_name or 'Umumiy' }}</span>
+                    </div>
+                    <div class="flex justify-between py-2 border-b border-gray-100 dark:border-gray-700/60">
+                        <span class="text-gray-400 font-medium">Kafolat muddati</span>
+                        <span class="font-bold text-gray-800 dark:text-gray-200">12 oy</span>
+                    </div>
+                    <div class="flex justify-between py-2 border-b border-gray-100 dark:border-gray-700/60">
+                        <span class="text-gray-400 font-medium">Ishlab chiqarilgan mamlakat</span>
+                        <span class="font-bold text-gray-800 dark:text-gray-200">O'zbekiston / Xitoy</span>
+                    </div>
+                    <div class="flex justify-between py-2 border-b border-gray-100 dark:border-gray-700/60">
+                        <span class="text-gray-400 font-medium">Holati</span>
+                        <span class="font-bold text-gray-800 dark:text-gray-200">Yangi, orginal o'ramda</span>
+                    </div>
+                    <div class="flex justify-between py-2 border-b border-gray-100 dark:border-gray-700/60">
+                        <span class="text-gray-400 font-medium">Artikul (SKU)</span>
+                        <span class="font-bold text-gray-800 dark:text-gray-200">{{ product.sku or 'BZ-9921' }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB CONTENT 2: REVIEWS & FORM -->
+        <div id="tab-content-reviews" class="p-6 sm:p-8 space-y-8 hidden" id="reviews-section">
+            
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+                
+                <!-- Rating Stats (4 cols) -->
+                <div class="md:col-span-4 p-6 bg-gray-50 dark:bg-gray-900/60 rounded-3xl text-center space-y-3">
+                    <div class="text-5xl font-black text-gray-900 dark:text-white">{{ product.rating or '4.9' }}</div>
+                    <div class="flex justify-center text-amber-400 text-xl">
+                        ★★★★★
+                    </div>
+                    <div class="text-xs text-gray-400 font-medium">
+                        Jami {{ product.reviews_count or 12 }} ta baholash asosida
+                    </div>
+                </div>
+
+                <!-- Add Review Form (8 cols) -->
+                <div class="md:col-span-8 space-y-4">
+                    <h4 class="font-extrabold text-base text-gray-900 dark:text-white">O'z fikringiz va sharhingizni qoldiring</h4>
+                    
+                    {% if current_user %}
+                    <form id="review-form" onsubmit="submitReview(event)" class="space-y-4">
+                        <input type="hidden" name="product_id" value="{{ product.id }}">
+                        
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase mb-1">Baho bering:</label>
+                            <select name="rating" id="review-rating" class="px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-bold text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500">
+                                <option value="5">⭐⭐⭐⭐⭐ 5 - A'lo</option>
+                                <option value="4">⭐⭐⭐⭐ 4 - Yaxshi</option>
+                                <option value="3">⭐⭐⭐ 3 - Qoniqarli</option>
+                                <option value="2">⭐⭐ 2 - Yomon</option>
+                                <option value="1">⭐ 1 - Juda yomon</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase mb-1">Sharh matni:</label>
+                            <textarea name="comment" id="review-comment" rows="3" placeholder="Mahsulotning afzalliklari va kamchiliklari haqida batafsil yozing..." class="w-full p-3.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl text-sm text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500" required></textarea>
+                        </div>
+
+                        <button type="submit" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-md transition-all active:scale-95">
+                            Sharh yuborish
+                        </button>
+                    </form>
+                    {% else %}
+                    <div class="p-4 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-2xl text-xs text-amber-800 dark:text-amber-200 flex items-center justify-between">
+                        <span>Sharh qoldirish uchun avval tizimga kirishingiz lozim.</span>
+                        <a href="/kirish" class="px-3 py-1.5 bg-amber-600 text-white font-bold rounded-xl hover:bg-amber-700 transition-all">Kirish</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- REVIEWS LIST -->
+            <div class="space-y-4 pt-4 border-t border-gray-100 dark:border-gray-700/80" id="reviews-list-container">
+                <h4 class="font-black text-lg text-gray-900 dark:text-white">Xaridorlar sharhlari</h4>
+
+                <!-- Sample Review Item 1 -->
+                <div class="p-4 bg-gray-50 dark:bg-gray-900/40 rounded-2xl space-y-2">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center text-xs">
+                                A
+                            </div>
+                            <span class="font-bold text-sm text-gray-900 dark:text-white">Anvar Qodirov</span>
+                            <span class="text-xs text-emerald-600 bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded font-semibold">✓ Xarid qilingan</span>
+                        </div>
+                        <span class="text-xs text-gray-400">Kecha, 14:20</span>
+                    </div>
+                    <div class="text-amber-400 text-xs">★★★★★</div>
+                    <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-300">
+                        Mahsulot juda sifatli va aytilganidek tez yetkazib berildi. O'ram a'lo darajada. Tavsiya qilaman!
+                    </p>
+                </div>
+
+                <!-- Sample Review Item 2 -->
+                <div class="p-4 bg-gray-50 dark:bg-gray-900/40 rounded-2xl space-y-2">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-full bg-purple-600 text-white font-bold flex items-center justify-center text-xs">
+                                N
+                            </div>
+                            <span class="font-bold text-sm text-gray-900 dark:text-white">Nodira Saidova</span>
+                            <span class="text-xs text-emerald-600 bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded font-semibold">✓ Xarid qilingan</span>
+                        </div>
+                        <span class="text-xs text-gray-400">3 kun avval</span>
+                    </div>
+                    <div class="text-amber-400 text-xs">★★★★★</div>
+                    <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-300">
+                        Muddatli to'lovga olish juda qulay bo'ldi. Uzum kabi tez va sifatli xizmat ko'rsatishdi. Rahmat BozorUz!
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- SIMILAR PRODUCTS SECTION -->
+    {% if similar_products %}
+    <section class="space-y-4 pt-4">
+        <div class="flex items-center justify-between">
+            <h2 class="text-xl sm:text-2xl font-black text-gray-900 dark:text-white flex items-center gap-2">
+                <span>🔄</span> O'xshash mahsulotlar
+            </h2>
+            <a href="/katalog?kategoriya={{ product.category_slug or '' }}" class="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
+                Ko'proq ko'rish →
+            </a>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {% for sim_prod in similar_products %}
+                {% set product = sim_prod %}
+                {% include 'components/product_card.html' %}
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const productPrice = {{ product.price or 0 }};
+
+    // Quantity Plus/Minus buttons
+    document.addEventListener('DOMContentLoaded', () => {
+        const qtyInput = document.getElementById('product-qty-input');
+        const qtyMinus = document.getElementById('qty-minus');
+        const qtyPlus = document.getElementById('qty-plus');
+
+        if (qtyMinus && qtyInput) {
+            qtyMinus.addEventListener('click', () => {
+                let val = parseInt(qtyInput.value) || 1;
+                if (val > 1) qtyInput.value = val - 1;
+            });
+        }
+
+        if (qtyPlus && qtyInput) {
+            qtyPlus.addEventListener('click', () => {
+                let val = parseInt(qtyInput.value) || 1;
+                let max = parseInt(qtyInput.getAttribute('max')) || 99;
+                if (val < max) qtyInput.value = val + 1;
+            });
+        }
+
+        // Installment UI init
+        if (typeof updateInstallmentUI === 'function') {
+            updateInstallmentUI(productPrice);
+        }
+
+        // Variant Selectors click handling
+        const variantBtns = document.querySelectorAll('.variant-opt-btn');
+        variantBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                variantBtns.forEach(b => {
+                    b.classList.remove('border-2', 'border-indigo-600', 'bg-indigo-50', 'dark:bg-indigo-950/60', 'text-indigo-600', 'dark:text-indigo-400');
+                    b.classList.add('border', 'border-gray-200', 'dark:border-gray-700', 'bg-white', 'dark:bg-gray-800', 'text-gray-700', 'dark:text-gray-300');
+                });
+                this.classList.remove('border', 'border-gray-200', 'dark:border-gray-700', 'bg-white', 'dark:bg-gray-800', 'text-gray-700', 'dark:text-gray-300');
+                this.classList.add('border-2', 'border-indigo-600', 'bg-indigo-50', 'dark:bg-indigo-950/60', 'text-indigo-600', 'dark:text-indigo-400');
+            });
+        });
+    });
+
+    // Add to cart wrapper with selected quantity & variant
+    function handleAddToCart() {
+        const qtyInput = document.getElementById('product-qty-input');
+        const quantity = qtyInput ? parseInt(qtyInput.value) || 1 : 1;
+        
+        const activeVariantBtn = document.querySelector('.variant-opt-btn.border-indigo-600');
+        const variant = activeVariantBtn ? activeVariantBtn.innerText.trim() : 'Asosiy';
+
+        addToCart({{ product.id }}, quantity, variant);
+    }
+
+    // Tabs Switcher (Description vs Reviews)
+    function switchTab(tabName) {
+        const descTab = document.getElementById('tab-content-desc');
+        const reviewsTab = document.getElementById('tab-content-reviews');
+        const descBtn = document.getElementById('tab-btn-desc');
+        const reviewsBtn = document.getElementById('tab-btn-reviews');
+
+        if (tabName === 'desc') {
+            descTab.classList.remove('hidden');
+            reviewsTab.classList.add('hidden');
+
+            descBtn.className = "tab-btn px-6 py-4 font-extrabold text-sm text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 transition-all flex items-center gap-2";
+            reviewsBtn.className = "tab-btn px-6 py-4 font-bold text-sm text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 border-b-2 border-transparent transition-all flex items-center gap-2";
+        } else {
+            descTab.classList.add('hidden');
+            reviewsTab.classList.remove('hidden');
+
+            reviewsBtn.className = "tab-btn px-6 py-4 font-extrabold text-sm text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 transition-all flex items-center gap-2";
+            descBtn.className = "tab-btn px-6 py-4 font-bold text-sm text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 border-b-2 border-transparent transition-all flex items-center gap-2";
+        }
+    }
+
+    // Submit Review via AJAX
+    function submitReview(e) {
+        e.preventDefault();
+        const rating = document.getElementById('review-rating').value;
+        const comment = document.getElementById('review-comment').value;
+
+        fetch('/api/sharh-qoshish', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                product_id: {{ product.id }},
+                rating: parseInt(rating),
+                comment: comment
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                renderNotification(data.message, "success");
+                
+                // Add new review to top of container dynamically
+                const container = document.getElementById('reviews-list-container');
+                const newRev = document.createElement('div');
+                newRev.className = "p-4 bg-indigo-50/50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900 rounded-2xl space-y-2 animate-pulse";
+                newRev.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center text-xs">
+                                ${data.user_name.charAt(0)}
+                            </div>
+                            <span class="font-bold text-sm text-gray-900 dark:text-white">${data.user_name}</span>
+                            <span class="text-xs text-indigo-600 font-bold">(Hozirgi sharh)</span>
+                        </div>
+                        <span class="text-xs text-gray-400">Hozirgina</span>
+                    </div>
+                    <div class="text-amber-400 text-xs">${'★'.repeat(data.rating)}</div>
+                    <p class="text-xs sm:text-sm text-gray-700 dark:text-gray-200">${data.comment}</p>
+                `;
+                container.insertBefore(newRev, container.children[1]);
+
+                document.getElementById('review-comment').value = '';
+            } else {
+                renderNotification(data.message || "Xatolik yuz berdi", "danger");
+            }
+        })
+        .catch(() => {
+            renderNotification("Sharh yuborishda xatolik yuz berdi.", "danger");
+        });
+    }
+</script>
+{% endblock %}
