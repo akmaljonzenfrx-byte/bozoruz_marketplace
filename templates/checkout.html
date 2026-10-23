@@ -1,0 +1,464 @@
+{% extends "base.html" %}
+
+{% block title %}Buyurtmani rasmiylashtirish | BozorUz{% endblock %}
+
+{% block content %}
+<div class="space-y-6 pb-16">
+
+    <!-- BREADCRUMB & PAGE TITLE -->
+    <div class="flex flex-col gap-2">
+        <nav class="flex text-xs text-gray-500 dark:text-gray-400 gap-2 items-center">
+            <a href="/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Bosh sahifa</a>
+            <span>/</span>
+            <a href="/savat" class="hover:text-indigo-600 dark:hover:text-indigo-400">Savat</a>
+            <span>/</span>
+            <span class="text-gray-800 dark:text-gray-200 font-medium">Buyurtmani rasmiylashtirish</span>
+        </nav>
+        <h1 class="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white flex items-center gap-3">
+            <span>📝</span> Buyurtmani rasmiylashtirish
+        </h1>
+    </div>
+
+    <form id="checkout-form" method="POST" action="/buyurtma-berish" class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- LEFT COLUMN: ADDRESS, DELIVERY, PAYMENT -->
+        <div class="lg:col-span-8 space-y-6">
+
+            <!-- 1. QABUL QILUVCHI VA MANZIL -->
+            <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 border border-gray-100 dark:border-gray-700/80 shadow-sm space-y-5">
+                <div class="flex items-center gap-3 border-b border-gray-100 dark:border-gray-700/80 pb-4">
+                    <span class="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 font-bold flex items-center justify-center text-sm">1</span>
+                    <h2 class="text-lg font-bold text-gray-900 dark:text-white">Qabul qiluvchi ma'lumotlari va manzil</h2>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300 mb-1.5">
+                            Ism va Familiya <span class="text-rose-500">*</span>
+                        </label>
+                        <input type="text" name="full_name" required value="{{ current_user.name if current_user else '' }}" placeholder="Masalan: Alisher Navoiy" class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300 mb-1.5">
+                            Telefon raqami <span class="text-rose-500">*</span>
+                        </label>
+                        <input type="tel" name="phone" required value="{{ current_user.phone if current_user else '+998' }}" placeholder="+998 90 123 45 67" class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+                    </div>
+
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300 mb-1.5">
+                            Viloyat / Shahar <span class="text-rose-500">*</span>
+                        </label>
+                        <select name="city" class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all cursor-pointer">
+                            <option value="Toshkent shahri" selected>Toshkent shahri</option>
+                            <option value="Toshkent viloyati">Toshkent viloyati</option>
+                            <option value="Samarqand">Samarqand viloyati</option>
+                            <option value="Andijon">Andijon viloyati</option>
+                            <option value="Farg'ona">Farg'ona viloyati</option>
+                            <option value="Namangan">Namangan viloyati</option>
+                            <option value="Buxoro">Buxoro viloyati</option>
+                            <option value="Xorazm">Xorazm viloyati</option>
+                            <option value="Qashqadaryo">Qashqadaryo viloyati</option>
+                            <option value="Surxondaryo">Surxondaryo viloyati</option>
+                            <option value="Navoiy">Navoiy viloyati</option>
+                            <option value="Jizzax">Jizzax viloyati</option>
+                            <option value="Sirdaryo">Sirdaryo viloyati</option>
+                            <option value="Qoraqalpog'iston">Qoraqalpog'iston Respublika</option>
+                        </select>
+                    </div>
+
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300 mb-1.5">
+                            Yetkazib berish manzili <span class="text-rose-500">*</span>
+                        </label>
+                        <textarea name="address" required rows="2" placeholder="Tuman, ko'cha, uy raqami, xonadon, mo'ljal..." class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all resize-none"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. YETKAZIB BERISH USULI -->
+            <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 border border-gray-100 dark:border-gray-700/80 shadow-sm space-y-5">
+                <div class="flex items-center gap-3 border-b border-gray-100 dark:border-gray-700/80 pb-4">
+                    <span class="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 font-bold flex items-center justify-center text-sm">2</span>
+                    <h2 class="text-lg font-bold text-gray-900 dark:text-white">Yetkazib berish usuli</h2>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <label class="delivery-option relative border-2 border-indigo-600 bg-indigo-50/50 dark:bg-indigo-950/40 p-4 rounded-2xl cursor-pointer transition-all flex items-start gap-3">
+                        <input type="radio" name="delivery_method" value="kuryer" checked class="mt-1 text-indigo-600 focus:ring-indigo-500">
+                        <div class="space-y-1">
+                            <div class="font-bold text-sm text-gray-900 dark:text-white flex items-center gap-2">
+                                <span>🚚 Kuryer orqali eshikkacha</span>
+                            </div>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">1-2 ish kuni ichida topshiriladi</p>
+                            <span class="inline-block text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                                {% if subtotal >= 200000 %}BEPUL (200 000 so'mdan oshgani uchun){% else %}20 000 so'm{% endif %}
+                            </span>
+                        </div>
+                    </label>
+
+                    <label class="delivery-option relative border-2 border-gray-200 dark:border-gray-700 p-4 rounded-2xl cursor-pointer transition-all flex items-start gap-3 hover:border-gray-300">
+                        <input type="radio" name="delivery_method" value="punkt" class="mt-1 text-indigo-600 focus:ring-indigo-500">
+                        <div class="space-y-1">
+                            <div class="font-bold text-sm text-gray-900 dark:text-white flex items-center gap-2">
+                                <span>🏬 Tarqatish punktidan olish</span>
+                            </div>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Ertaga soat 10:00 dan keyin tayyor</p>
+                            <span class="inline-block text-xs font-bold text-emerald-600 dark:text-emerald-400">BEPUL</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- 3. TO'LOV USULI VA SIMULYATSIYA -->
+            <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 border border-gray-100 dark:border-gray-700/80 shadow-sm space-y-5">
+                <div class="flex items-center gap-3 border-b border-gray-100 dark:border-gray-700/80 pb-4">
+                    <span class="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 font-bold flex items-center justify-center text-sm">3</span>
+                    <h2 class="text-lg font-bold text-gray-900 dark:text-white">To'lov usulini tanlang</h2>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <!-- Naqd -->
+                    <label class="payment-card-btn p-4 border-2 border-indigo-600 bg-indigo-50/50 dark:bg-indigo-950/40 rounded-2xl cursor-pointer transition-all text-center space-y-2">
+                        <input type="radio" name="payment_method" value="naqd" checked class="sr-only">
+                        <div class="text-2xl">💵</div>
+                        <div class="font-bold text-xs text-gray-900 dark:text-white">Naqd pul bilan</div>
+                        <div class="text-[10px] text-gray-500 dark:text-gray-400">Olganda to'lash</div>
+                    </label>
+
+                    <!-- Karta (Click/Payme/Uzum) -->
+                    <label class="payment-card-btn p-4 border-2 border-gray-200 dark:border-gray-700 rounded-2xl cursor-pointer transition-all text-center space-y-2 hover:border-gray-300">
+                        <input type="radio" name="payment_method" value="karta" class="sr-only">
+                        <div class="text-2xl">💳</div>
+                        <div class="font-bold text-xs text-gray-900 dark:text-white">Onlayn Karta</div>
+                        <div class="text-[10px] text-gray-500 dark:text-gray-400">Click, Payme, Uzum</div>
+                    </label>
+
+                    <!-- Muddatli To'lov -->
+                    <label class="payment-card-btn p-4 border-2 border-gray-200 dark:border-gray-700 rounded-2xl cursor-pointer transition-all text-center space-y-2 hover:border-gray-300">
+                        <input type="radio" name="payment_method" value="muddatli" class="sr-only">
+                        <div class="text-2xl">⚡</div>
+                        <div class="font-bold text-xs text-gray-900 dark:text-white">Muddatli to'lov</div>
+                        <div class="text-[10px] text-amber-600 font-bold">3, 6, 12 oyga bo'lib</div>
+                    </label>
+                </div>
+
+                <!-- DYNAMIC PAYMENT DETAILS SIMULATOR -->
+                <!-- Online Card Simulator Box -->
+                <div id="card-simulator-box" class="hidden p-5 bg-gradient-to-br from-indigo-900 to-purple-950 text-white rounded-2xl space-y-4 border border-indigo-700 shadow-inner">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold uppercase tracking-widest text-indigo-200">Onlayn To'lov Simulyatsiyasi</span>
+                        <div class="flex items-center gap-2 text-xs font-bold bg-white/10 px-2.5 py-1 rounded-lg">
+                            <span>Click</span> • <span>Payme</span> • <span>Uzum</span>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-[10px] uppercase font-bold text-indigo-200 mb-1">Karta raqami (Simulyatsiya)</label>
+                            <input type="text" maxlength="19" placeholder="8600 0000 0000 0000" class="w-full px-4 py-2.5 bg-black/30 border border-white/20 rounded-xl font-mono text-sm placeholder-white/40 focus:outline-none focus:border-white">
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[10px] uppercase font-bold text-indigo-200 mb-1">Amal qilish muddati</label>
+                                <input type="text" placeholder="12/28" class="w-full px-4 py-2.5 bg-black/30 border border-white/20 rounded-xl font-mono text-sm text-center placeholder-white/40 focus:outline-none focus:border-white">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] uppercase font-bold text-indigo-200 mb-1">SMS Simulyatsiya kodi</label>
+                                <input type="text" maxlength="6" value="7777" readonly class="w-full px-4 py-2.5 bg-emerald-500/20 border border-emerald-400 text-emerald-300 font-mono font-bold text-sm text-center rounded-xl">
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-[11px] text-indigo-200 opacity-80 italic">
+                        * Bu simulyatsiya rejimi bo'lib, haqiqiy pul yechib olinmaydi.
+                    </p>
+                </div>
+
+                <!-- Installment Selector Box -->
+                <div id="installment-simulator-box" class="hidden p-5 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-2xl space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold uppercase tracking-wider text-amber-800 dark:text-amber-200">Muddatli to'lov jadvali</span>
+                        <span class="text-xs font-bold text-emerald-600 bg-emerald-100 dark:bg-emerald-950 px-2 py-0.5 rounded-md">0% Boshlang'ich to'lov</span>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-3">
+                        <label class="month-choice-btn p-3 border-2 border-amber-500 bg-white dark:bg-gray-800 rounded-xl text-center cursor-pointer space-y-1">
+                            <input type="radio" name="installment_months" value="3" checked class="sr-only">
+                            <div class="text-sm font-black text-gray-900 dark:text-white">3 Oy</div>
+                            <div class="text-[10px] text-gray-500 font-semibold" id="m3-pay">...</div>
+                        </label>
+                        <label class="month-choice-btn p-3 border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-xl text-center cursor-pointer space-y-1">
+                            <input type="radio" name="installment_months" value="6" class="sr-only">
+                            <div class="text-sm font-black text-gray-900 dark:text-white">6 Oy</div>
+                            <div class="text-[10px] text-gray-500 font-semibold" id="m6-pay">...</div>
+                        </label>
+                        <label class="month-choice-btn p-3 border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-xl text-center cursor-pointer space-y-1">
+                            <input type="radio" name="installment_months" value="12" class="sr-only">
+                            <div class="text-sm font-black text-gray-900 dark:text-white">12 Oy</div>
+                            <div class="text-[10px] text-gray-500 font-semibold" id="m12-pay">...</div>
+                        </label>
+                    </div>
+
+                    <div class="text-xs text-amber-800 dark:text-amber-300 font-medium">
+                        Oylik to'lov: <strong id="selected-monthly-amount" class="text-sm font-black text-amber-600 dark:text-amber-400">0 so'm / oy</strong>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 4. IZOH -->
+            <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 border border-gray-100 dark:border-gray-700/80 shadow-sm space-y-3">
+                <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
+                    Kuryer yoki sotuvchi uchun izoh (Ixtiyoriy)
+                </label>
+                <input type="text" name="comment" placeholder="Masalan: Uyda bo'lmasam qo'shnimga berib keting..." class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+            </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN: ORDER SUMMARY & PROMO CODE -->
+        <div class="lg:col-span-4 space-y-6">
+
+            <!-- SUMMARY CARD -->
+            <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 border border-gray-100 dark:border-gray-700/80 shadow-lg space-y-6 sticky top-24">
+                <h3 class="text-lg font-black text-gray-900 dark:text-white pb-3 border-b border-gray-100 dark:border-gray-700">
+                    Buyurtma xulosasi
+                </h3>
+
+                <!-- ITEMS LIST SUMMARY -->
+                <div class="space-y-3 max-h-48 overflow-y-auto pr-1">
+                    {% for item in items %}
+                    <div class="flex items-center justify-between text-xs gap-2">
+                        <div class="truncate flex-grow">
+                            <span class="font-semibold text-gray-800 dark:text-gray-200 truncate block">{{ item.product_name }}</span>
+                            <span class="text-gray-400">{{ item.quantity }}x • {{ item.variant or 'Standart' }}</span>
+                        </div>
+                        <div class="font-bold text-gray-900 dark:text-white flex-shrink-0">
+                            {{ "{:,}".format(item.total_price).replace(',', ' ') }} so'm
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- PROMO CODE VALIDATOR BOX -->
+                <div class="pt-2 border-t border-gray-100 dark:border-gray-700">
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1.5">
+                        Promokodingiz bormi?
+                    </label>
+                    <div class="flex gap-2">
+                        <input type="text" id="promo-code-input" name="promo_code" placeholder="BOZOR2025" uppercase class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-xs font-mono uppercase font-bold text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
+                        <button type="button" id="apply-promo-btn" class="px-4 py-2 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 font-bold text-xs rounded-xl hover:opacity-90 transition-all flex-shrink-0">
+                            Tekshirish
+                        </button>
+                    </div>
+                    <div id="promo-msg" class="text-[11px] font-semibold mt-1.5 hidden"></div>
+                </div>
+
+                <!-- CALCULATION BREAKDOWN -->
+                <div class="space-y-2.5 pt-3 border-t border-gray-100 dark:border-gray-700 text-xs">
+                    <div class="flex justify-between text-gray-600 dark:text-gray-400">
+                        <span>Tovarlar narxi:</span>
+                        <span class="font-bold text-gray-800 dark:text-gray-200" id="summary-subtotal" data-value="{{ subtotal }}">{{ "{:,}".format(subtotal).replace(',', ' ') }} so'm</span>
+                    </div>
+
+                    <div class="flex justify-between text-gray-600 dark:text-gray-400">
+                        <span>Yetkazib berish:</span>
+                        <span class="font-bold text-gray-800 dark:text-gray-200" id="summary-delivery" data-value="{{ delivery_fee }}">
+                            {% if delivery_fee == 0 %}
+                            <span class="text-emerald-600 font-bold">BEPUL</span>
+                            {% else %}
+                            {{ "{:,}".format(delivery_fee).replace(',', ' ') }} so'm
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    <div id="promo-discount-row" class="flex justify-between text-rose-600 dark:text-rose-400 font-bold hidden">
+                        <span>Promokod chegirmasi:</span>
+                        <span id="summary-discount">-0 so'm</span>
+                    </div>
+
+                    <div class="flex justify-between items-baseline pt-3 border-t border-gray-100 dark:border-gray-700 text-base font-black text-gray-900 dark:text-white">
+                        <span>Jami to'lov:</span>
+                        <span class="text-xl text-indigo-600 dark:text-indigo-400" id="summary-grand-total" data-base="{{ grand_total }}">{{ "{:,}".format(grand_total).replace(',', ' ') }} so'm</span>
+                    </div>
+                </div>
+
+                <!-- SUBMIT BUTTON -->
+                <button type="submit" class="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-base rounded-2xl shadow-xl shadow-indigo-600/30 transition-all active:scale-95 flex items-center justify-center gap-2">
+                    <span>Buyurtmani Tasdiqlash</span>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                </button>
+
+                <!-- SECURITY TRUST BADGE -->
+                <div class="text-center pt-2">
+                    <p class="text-[10px] text-gray-400 flex items-center justify-center gap-1">
+                        <span>🔒</span> Ma'lumotlaringiz 256-bit SSL xavfsizlik standarti bilan himoyalangan
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+    </form>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const paymentRadios = document.querySelectorAll('input[name="payment_method"]');
+        const paymentCards = document.querySelectorAll('.payment-card-btn');
+        const cardBox = document.getElementById('card-simulator-box');
+        const installmentBox = document.getElementById('installment-simulator-box');
+
+        const deliveryRadios = document.querySelectorAll('input[name="delivery_method"]');
+        const deliveryCards = document.querySelectorAll('.delivery-option');
+
+        const baseGrandTotal = parseInt(document.getElementById('summary-grand-total').dataset.base) || 0;
+
+        // Payment Method Switcher
+        paymentRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                const val = e.target.value;
+
+                paymentCards.forEach(card => {
+                    const r = card.querySelector('input');
+                    if (r.checked) {
+                        card.classList.add('border-indigo-600', 'bg-indigo-50/50', 'dark:bg-indigo-950/40');
+                        card.classList.remove('border-gray-200', 'dark:border-gray-700');
+                    } else {
+                        card.classList.remove('border-indigo-600', 'bg-indigo-50/50', 'dark:bg-indigo-950/40');
+                        card.classList.add('border-gray-200', 'dark:border-gray-700');
+                    }
+                });
+
+                if (val === 'karta') {
+                    cardBox.classList.remove('hidden');
+                    installmentBox.classList.add('hidden');
+                } else if (val === 'muddatli') {
+                    installmentBox.classList.remove('hidden');
+                    cardBox.classList.add('hidden');
+                    updateInstallmentRates(baseGrandTotal);
+                } else {
+                    cardBox.classList.add('hidden');
+                    installmentBox.classList.add('hidden');
+                }
+            });
+        });
+
+        // Delivery Method Switcher
+        deliveryRadios.forEach(radio => {
+            radio.addEventListener('change', () => {
+                deliveryCards.forEach(card => {
+                    const r = card.querySelector('input');
+                    if (r.checked) {
+                        card.classList.add('border-indigo-600', 'bg-indigo-50/50', 'dark:bg-indigo-950/40');
+                        card.classList.remove('border-gray-200', 'dark:border-gray-700');
+                    } else {
+                        card.classList.remove('border-indigo-600', 'bg-indigo-50/50', 'dark:bg-indigo-950/40');
+                        card.classList.add('border-gray-200', 'dark:border-gray-700');
+                    }
+                });
+            });
+        });
+
+        // Installment Calculations
+        function updateInstallmentRates(totalSum) {
+            const m3 = Math.round(totalSum / 3);
+            const m6 = Math.round((totalSum * 1.05) / 6);
+            const m12 = Math.round((totalSum * 1.12) / 12);
+
+            document.getElementById('m3-pay').textContent = formatMoney(m3) + '/oy';
+            document.getElementById('m6-pay').textContent = formatMoney(m6) + '/oy';
+            document.getElementById('m12-pay').textContent = formatMoney(m12) + '/oy';
+
+            const activeMonthRadio = document.querySelector('input[name="installment_months"]:checked');
+            if (activeMonthRadio) {
+                const months = parseInt(activeMonthRadio.value);
+                let monthly = m3;
+                if (months === 6) monthly = m6;
+                if (months === 12) monthly = m12;
+                document.getElementById('selected-monthly-amount').textContent = formatMoney(monthly) + ' / oy';
+            }
+        }
+
+        const monthRadios = document.querySelectorAll('input[name="installment_months"]');
+        const monthCards = document.querySelectorAll('.month-choice-btn');
+
+        monthRadios.forEach(radio => {
+            radio.addEventListener('change', () => {
+                monthCards.forEach(card => {
+                    const r = card.querySelector('input');
+                    if (r.checked) {
+                        card.classList.add('border-amber-500');
+                        card.classList.remove('border-gray-200', 'dark:border-gray-700');
+                    } else {
+                        card.classList.remove('border-amber-500');
+                        card.classList.add('border-gray-200', 'dark:border-gray-700');
+                    }
+                });
+                updateInstallmentRates(baseGrandTotal);
+            });
+        });
+
+        // PROMO CODE CHECKER
+        let appliedDiscount = 0;
+        const promoBtn = document.getElementById('apply-promo-btn');
+        const promoInput = document.getElementById('promo-code-input');
+        const promoMsg = document.getElementById('promo-msg');
+        const discountRow = document.getElementById('promo-discount-row');
+        const discountDisplay = document.getElementById('summary-discount');
+        const grandTotalDisplay = document.getElementById('summary-grand-total');
+
+        if (promoBtn) {
+            promoBtn.addEventListener('click', () => {
+                const code = promoInput.value.trim().toUpperCase();
+                const subtotal = parseInt(document.getElementById('summary-subtotal').dataset.value) || 0;
+
+                if (!code) {
+                    showPromoMessage("Iltimos, promokodni kiriting!", "text-amber-600");
+                    return;
+                }
+
+                fetch('/api/promokod/tekshirish', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code: code, total_sum: subtotal })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.valid) {
+                        appliedDiscount = data.discount_amount;
+                        showPromoMessage(`✅ Promokod qabul qilindi! (${data.message})`, "text-emerald-600 dark:text-emerald-400");
+                        
+                        discountDisplay.textContent = '-' + formatMoney(appliedDiscount);
+                        discountRow.classList.remove('hidden');
+
+                        const newGrandTotal = Math.max(0, baseGrandTotal - appliedDiscount);
+                        grandTotalDisplay.textContent = formatMoney(newGrandTotal);
+                        
+                        if (typeof updateInstallmentRates === 'function') {
+                            updateInstallmentRates(newGrandTotal);
+                        }
+                    } else {
+                        appliedDiscount = 0;
+                        discountRow.classList.add('hidden');
+                        grandTotalDisplay.textContent = formatMoney(baseGrandTotal);
+                        showPromoMessage(`❌ ${data.message || "Promokod noto'g'ri"}`, "text-rose-600 dark:text-rose-400");
+                    }
+                })
+                .catch(() => {
+                    showPromoMessage("Tarmoq xatosi qayta urinib ko'ring.", "text-rose-600");
+                });
+            });
+        }
+
+        function showPromoMessage(msg, colorClass) {
+            promoMsg.textContent = msg;
+            promoMsg.className = `text-[11px] font-semibold mt-1.5 ${colorClass}`;
+            promoMsg.classList.remove('hidden');
+        }
+    });
+</script>
+{% endblock %}
