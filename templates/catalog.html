@@ -1,0 +1,307 @@
+{% extends "base.html" %}
+
+{% block title %}{% if active_category %}{{ active_category.name }} - Katalog{% elif search_query %}"{{ search_query }}" bo'yicha qidiruv{% else %}Mahsulotlar katalogi{% endif %} | BozorUz{% endblock %}
+
+{% block content %}
+<div class="space-y-6 pb-12">
+
+    <!-- BREADCRUMB & HEADER -->
+    <div class="flex flex-col gap-2">
+        <nav class="flex text-xs text-gray-500 dark:text-gray-400 gap-2 items-center">
+            <a href="/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Bosh sahifa</a>
+            <span>/</span>
+            <a href="/katalog" class="hover:text-indigo-600 dark:hover:text-indigo-400">Katalog</a>
+            {% if active_category %}
+            <span>/</span>
+            <span class="text-gray-800 dark:text-gray-200 font-medium">{{ active_category.name }}</span>
+            {% elif search_query %}
+            <span>/</span>
+            <span class="text-gray-800 dark:text-gray-200 font-medium">Qidiruv natijalari</span>
+            {% endif %}
+        </nav>
+
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-1">
+            <div>
+                <h1 class="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white flex items-center gap-3">
+                    {% if active_category %}
+                        <span>{{ active_category.icon or '📂' }}</span>
+                        <span>{{ active_category.name }}</span>
+                    {% elif search_query %}
+                        <span>🔍</span>
+                        <span>"{{ search_query }}" bo'yicha qidiruv</span>
+                    {% else %}
+                        <span>🛍️</span>
+                        <span>Barcha mahsulotlar</span>
+                    {% endif %}
+                </h1>
+                <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    Jami <strong class="text-indigo-600 dark:text-indigo-400 font-bold">{{ total_count }} ta</strong> mahsulot topildi
+                </p>
+            </div>
+
+            <!-- MOBIL FILTR TUGMASI -->
+            <button id="mobile-filter-toggle" class="lg:hidden inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl font-semibold text-sm text-gray-700 dark:text-gray-200 shadow-sm active:scale-95 transition-all">
+                <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+                <span>Filtrlar</span>
+                {% if min_price or max_price or has_discount or active_category %}
+                <span class="w-2 h-2 rounded-full bg-indigo-600"></span>
+                {% endif %}
+            </button>
+        </div>
+    </div>
+
+    <!-- FAOL FILTR CHIPLARI (ACTIVE FILTERS CHIPS) -->
+    {% if active_category or search_query or min_price or max_price or has_discount %}
+    <div class="flex flex-wrap items-center gap-2 p-3 bg-indigo-50/50 dark:bg-indigo-950/30 rounded-2xl border border-indigo-100 dark:border-indigo-900/40">
+        <span class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mr-1">Faol filtrlar:</span>
+        
+        {% if active_category %}
+        <a href="/katalog?{% if search_query %}q={{ search_query }}&{% endif %}{% if min_narx %}min_narx={{ min_narx }}&{% endif %}{% if max_narx %}max_narx={{ max_narx }}&{% endif %}{% if has_discount %}chegirma=1&{% endif %}saralash={{ sort_by }}" class="inline-flex items-center gap-1.5 px-3 py-1 bg-white dark:bg-gray-800 border border-indigo-200 dark:border-indigo-800 rounded-lg text-xs font-semibold text-indigo-700 dark:text-indigo-300 shadow-sm hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition-all">
+            <span>Kategoriya: {{ active_category.name }}</span>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </a>
+        {% endif %}
+
+        {% if search_query %}
+        <a href="/katalog?{% if active_category %}kategoriya={{ active_category.slug }}&{% endif %}{% if min_narx %}min_narx={{ min_narx }}&{% endif %}{% if max_narx %}max_narx={{ max_narx }}&{% endif %}{% if has_discount %}chegirma=1&{% endif %}saralash={{ sort_by }}" class="inline-flex items-center gap-1.5 px-3 py-1 bg-white dark:bg-gray-800 border border-indigo-200 dark:border-indigo-800 rounded-lg text-xs font-semibold text-indigo-700 dark:text-indigo-300 shadow-sm hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition-all">
+            <span>Matn: "{{ search_query }}"</span>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </a>
+        {% endif %}
+
+        {% if min_price or max_price %}
+        <a href="/katalog?{% if active_category %}kategoriya={{ active_category.slug }}&{% endif %}{% if search_query %}q={{ search_query }}&{% endif %}{% if has_discount %}chegirma=1&{% endif %}saralash={{ sort_by }}" class="inline-flex items-center gap-1.5 px-3 py-1 bg-white dark:bg-gray-800 border border-indigo-200 dark:border-indigo-800 rounded-lg text-xs font-semibold text-indigo-700 dark:text-indigo-300 shadow-sm hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition-all">
+            <span>Narx: {% if min_price %}{{ "{:,}".format(min_price).replace(',', ' ') }}{% else %}0{% endif %} - {% if max_price %}{{ "{:,}".format(max_price).replace(',', ' ') }}{% else %}Cheksiz{% endif %} so'm</span>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </a>
+        {% endif %}
+
+        {% if has_discount %}
+        <a href="/katalog?{% if active_category %}kategoriya={{ active_category.slug }}&{% endif %}{% if search_query %}q={{ search_query }}&{% endif %}{% if min_narx %}min_narx={{ min_narx }}&{% endif %}{% if max_narx %}max_narx={{ max_narx }}&{% endif %}saralash={{ sort_by }}" class="inline-flex items-center gap-1.5 px-3 py-1 bg-white dark:bg-gray-800 border border-rose-200 dark:border-rose-800 rounded-lg text-xs font-semibold text-rose-600 dark:text-rose-400 shadow-sm hover:bg-rose-50 transition-all">
+            <span>🔥 Faqat chegirmalar</span>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </a>
+        {% endif %}
+
+        <a href="/katalog" class="text-xs font-semibold text-rose-600 dark:text-rose-400 hover:underline ml-auto">
+            Tozalash
+        </a>
+    </div>
+    {% endif %}
+
+    <!-- MAIN CONTENT GRID (SIDEBAR + PRODUCTS) -->
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
+
+        <!-- SIDEBAR FILTRLAR (DESKTOP + MOBILE DRAWER) -->
+        <aside id="filter-sidebar" class="fixed lg:relative inset-0 z-50 lg:z-auto bg-black/50 lg:bg-transparent hidden lg:block overflow-y-auto lg:overflow-visible transition-all">
+            <div class="relative w-full max-w-xs lg:max-w-none ml-auto lg:ml-0 min-h-screen lg:min-h-0 bg-white dark:bg-gray-800 lg:bg-transparent p-6 lg:p-0 space-y-6 shadow-2xl lg:shadow-none border-l lg:border-l-0 border-gray-200 dark:border-gray-700">
+                
+                <!-- Mobil Yopish Tugmasi -->
+                <div class="flex items-center justify-between lg:hidden border-b border-gray-100 dark:border-gray-700 pb-4">
+                    <h3 class="font-bold text-lg text-gray-900 dark:text-white flex items-center gap-2">
+                        <span>⚙️</span> Filtrlar
+                    </h3>
+                    <button id="mobile-filter-close" class="p-2 rounded-xl text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+
+                <form method="GET" action="/katalog" class="space-y-6">
+                    {% if search_query %}
+                    <input type="hidden" name="q" value="{{ search_query }}">
+                    {% endif %}
+
+                    <!-- 1. KATEGORIYALAR BO'LIMI -->
+                    <div class="p-5 bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700/80 shadow-sm space-y-3">
+                        <h4 class="font-bold text-sm text-gray-900 dark:text-white uppercase tracking-wider flex items-center justify-between">
+                            <span>Kategoriyalar</span>
+                            <span class="text-xs font-normal text-gray-400">({{ nav_categories|length }})</span>
+                        </h4>
+                        <div class="space-y-1 max-h-60 overflow-y-auto pr-1">
+                            <a href="/katalog?{% if search_query %}q={{ search_query }}&{% endif %}{% if min_price %}min_narx={{ min_price }}&{% endif %}{% if max_price %}max_narx={{ max_price }}&{% endif %}{% if has_discount %}chegirma=1&{% endif %}saralash={{ sort_by }}" class="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all {% if not active_category %}bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 font-bold{% else %}text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50{% endif %}">
+                                <span>Barchasi</span>
+                                <span>→</span>
+                            </a>
+                            {% for cat in nav_categories %}
+                            <a href="/katalog?kategoriya={{ cat.slug }}{% if search_query %}&q={{ search_query }}{% endif %}{% if min_price %}&min_narx={{ min_price }}{% endif %}{% if max_price %}&max_narx={{ max_price }}{% endif %}{% if has_discount %}&chegirma=1{% endif %}&saralash={{ sort_by }}" class="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all {% if active_category and active_category.id == cat.id %}bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 font-bold{% else %}text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50{% endif %}">
+                                <span class="flex items-center gap-2">
+                                    <span>{{ cat.icon or '📦' }}</span>
+                                    <span>{{ cat.name }}</span>
+                                </span>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- 2. NARX ORALIG'I FILTRI -->
+                    <div class="p-5 bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700/80 shadow-sm space-y-4">
+                        <h4 class="font-bold text-sm text-gray-900 dark:text-white uppercase tracking-wider">
+                            Narx oralig'i (so'm)
+                        </h4>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-[10px] text-gray-400 font-semibold uppercase">Dan</label>
+                                <input type="number" name="min_narx" placeholder="0" value="{{ min_price or '' }}" class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-xs text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-gray-400 font-semibold uppercase">Gacha</label>
+                                <input type="number" name="max_narx" placeholder="Max" value="{{ max_price or '' }}" class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-xs text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. CHEGIRMALI MAHSULOTLAR TOGGLE -->
+                    <div class="p-5 bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700/80 shadow-sm">
+                        <label class="flex items-center justify-between cursor-pointer">
+                            <span class="flex items-center gap-2 text-xs font-bold text-gray-800 dark:text-gray-200">
+                                <span>🔥</span>
+                                <span>Faqat chegirmalar</span>
+                            </span>
+                            <input type="checkbox" name="chegirma" value="1" {% if has_discount %}checked{% endif %} class="w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500">
+                        </label>
+                    </div>
+
+                    <!-- 4. AKSIYA TUGMALARI -->
+                    <div class="space-y-2 pt-2">
+                        <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-2xl shadow-lg shadow-indigo-600/30 transition-all active:scale-95 flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+                            <span>Filtrni qo'llash</span>
+                        </button>
+
+                        <a href="/katalog" class="block w-full py-2.5 text-center bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-bold text-xs rounded-2xl transition-all">
+                            Barcha filtrlarni tashlash
+                        </a>
+                    </div>
+                </form>
+
+            </div>
+        </aside>
+
+        <!-- RIGHT AREA: SORTING BAR & PRODUCT GRID -->
+        <main class="lg:col-span-3 space-y-6">
+
+            <!-- SARALASH PANELI (SORTING BAR) -->
+            <div class="p-4 bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700/80 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div class="flex items-center gap-2 text-xs font-semibold text-gray-500 dark:text-gray-400">
+                    <span>Saralash tartibi:</span>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-1.5 w-full sm:w-auto">
+                    <a href="/katalog?{% if active_category %}kategoriya={{ active_category.slug }}&{% endif %}{% if search_query %}q={{ search_query }}&{% endif %}{% if min_price %}min_narx={{ min_price }}&{% endif %}{% if max_price %}max_narx={{ max_price }}&{% endif %}{% if has_discount %}chegirma=1&{% endif %}saralash=popular" class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all {% if sort_by == 'popular' or not sort_by %}bg-indigo-600 text-white shadow-md shadow-indigo-600/20{% else %}bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200{% endif %}">
+                        🔥 Ommabop
+                    </a>
+                    <a href="/katalog?{% if active_category %}kategoriya={{ active_category.slug }}&{% endif %}{% if search_query %}q={{ search_query }}&{% endif %}{% if min_price %}min_narx={{ min_price }}&{% endif %}{% if max_price %}max_narx={{ max_price }}&{% endif %}{% if has_discount %}chegirma=1&{% endif %}saralash=price_asc" class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all {% if sort_by == 'price_asc' %}bg-indigo-600 text-white shadow-md shadow-indigo-600/20{% else %}bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200{% endif %}">
+                        Arzonroq
+                    </a>
+                    <a href="/katalog?{% if active_category %}kategoriya={{ active_category.slug }}&{% endif %}{% if search_query %}q={{ search_query }}&{% endif %}{% if min_price %}min_narx={{ min_price }}&{% endif %}{% if max_price %}max_narx={{ max_price }}&{% endif %}{% if has_discount %}chegirma=1&{% endif %}saralash=price_desc" class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all {% if sort_by == 'price_desc' %}bg-indigo-600 text-white shadow-md shadow-indigo-600/20{% else %}bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200{% endif %}">
+                        Qimmatroq
+                    </a>
+                    <a href="/katalog?{% if active_category %}kategoriya={{ active_category.slug }}&{% endif %}{% if search_query %}q={{ search_query }}&{% endif %}{% if min_price %}min_narx={{ min_price }}&{% endif %}{% if max_price %}max_narx={{ max_price }}&{% endif %}{% if has_discount %}chegirma=1&{% endif %}saralash=rating" class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all {% if sort_by == 'rating' %}bg-indigo-600 text-white shadow-md shadow-indigo-600/20{% else %}bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200{% endif %}">
+                        ⭐ Reyting
+                    </a>
+                    <a href="/katalog?{% if active_category %}kategoriya={{ active_category.slug }}&{% endif %}{% if search_query %}q={{ search_query }}&{% endif %}{% if min_price %}min_narx={{ min_price }}&{% endif %}{% if max_price %}max_narx={{ max_price }}&{% endif %}{% if has_discount %}chegirma=1&{% endif %}saralash=newest" class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all {% if sort_by == 'newest' %}bg-indigo-600 text-white shadow-md shadow-indigo-600/20{% else %}bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200{% endif %}">
+                        Yangi
+                    </a>
+                </div>
+            </div>
+
+            <!-- PRODUCT GRID -->
+            {% if products %}
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {% for product in products %}
+                    {% include 'components/product_card.html' %}
+                {% endfor %}
+            </div>
+
+            <!-- SAHIFALASH (PAGINATION) -->
+            {% if total_pages > 1 %}
+            <div class="flex items-center justify-center gap-2 pt-8">
+                <!-- Avvalgi Sahifa -->
+                {% if current_page > 1 %}
+                <a href="/katalog?{% if active_category %}kategoriya={{ active_category.slug }}&{% endif %}{% if search_query %}q={{ search_query }}&{% endif %}{% if min_price %}min_narx={{ min_price }}&{% endif %}{% if max_price %}max_narx={{ max_price }}&{% endif %}{% if has_discount %}chegirma=1&{% endif %}saralash={{ sort_by }}&sahifa={{ current_page - 1 }}" class="p-2.5 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all shadow-sm">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                </a>
+                {% endif %}
+
+                <!-- Sahifa Raqamlari -->
+                {% for p in range(1, total_pages + 1) %}
+                    {% if p == current_page %}
+                    <span class="w-10 h-10 rounded-xl bg-indigo-600 text-white font-black flex items-center justify-center text-sm shadow-md shadow-indigo-600/30">
+                        {{ p }}
+                    </span>
+                    {% elif p <= 3 or p >= total_pages - 1 or (p >= current_page - 1 and p <= current_page + 1) %}
+                    <a href="/katalog?{% if active_category %}kategoriya={{ active_category.slug }}&{% endif %}{% if search_query %}q={{ search_query }}&{% endif %}{% if min_price %}min_narx={{ min_price }}&{% endif %}{% if max_price %}max_narx={{ max_price }}&{% endif %}{% if has_discount %}chegirma=1&{% endif %}saralash={{ sort_by }}&sahifa={{ p }}" class="w-10 h-10 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 hover:bg-indigo-50 dark:hover:bg-gray-700 font-bold flex items-center justify-center text-sm transition-all shadow-sm">
+                        {{ p }}
+                    </a>
+                    {% elif loop.first or loop.last %}
+                    <span class="text-gray-400">...</span>
+                    {% endif %}
+                {% endfor %}
+
+                <!-- Keyingi Sahifa -->
+                {% if current_page < total_pages %}
+                <a href="/katalog?{% if active_category %}kategoriya={{ active_category.slug }}&{% endif %}{% if search_query %}q={{ search_query }}&{% endif %}{% if min_price %}min_narx={{ min_price }}&{% endif %}{% if max_price %}max_narx={{ max_price }}&{% endif %}{% if has_discount %}chegirma=1&{% endif %}saralash={{ sort_by }}&sahifa={{ current_page + 1 }}" class="p-2.5 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all shadow-sm">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </a>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            {% else %}
+            <!-- BO'SH HOLAT EKRANI (EMPTY STATE) -->
+            <div class="py-16 text-center bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700 p-8 space-y-4 shadow-sm">
+                <div class="w-24 h-24 mx-auto rounded-3xl bg-indigo-50 dark:bg-indigo-950/60 flex items-center justify-center text-5xl shadow-inner">
+                    🔍
+                </div>
+                <div class="max-w-md mx-auto space-y-2">
+                    <h3 class="text-xl font-black text-gray-900 dark:text-white">Afsuski, hech narsa topilmadi</h3>
+                    <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                        Siz kiritgan qidiruv sozlamalari bo'yicha mahsulotlar mavjud emas. Filtrlarni o'zgartirib qayta urinib ko'ring.
+                    </p>
+                </div>
+                <div class="pt-2">
+                    <a href="/katalog" class="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl shadow-lg transition-all text-sm">
+                        <span>Barcha mahsulotlarni ko'rish</span>
+                        <span>→</span>
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+
+        </main>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const filterToggle = document.getElementById('mobile-filter-toggle');
+        const filterSidebar = document.getElementById('filter-sidebar');
+        const filterClose = document.getElementById('mobile-filter-close');
+
+        if (filterToggle && filterSidebar) {
+            filterToggle.addEventListener('click', () => {
+                filterSidebar.classList.remove('hidden');
+                document.body.classList.add('overflow-hidden');
+            });
+        }
+
+        if (filterClose && filterSidebar) {
+            filterClose.addEventListener('click', () => {
+                filterSidebar.classList.add('hidden');
+                document.body.classList.remove('overflow-hidden');
+            });
+        }
+
+        // Sidebar orqa fonini bosganda yopish
+        filterSidebar.addEventListener('click', (e) => {
+            if (e.target === filterSidebar) {
+                filterSidebar.classList.add('hidden');
+                document.body.classList.remove('overflow-hidden');
+            }
+        });
+    });
+</script>
+{% endblock %}
